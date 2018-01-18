@@ -18,12 +18,16 @@
 
 const functions = require('firebase-functions'); // Cloud Functions for Firebase library
 const DialogflowApp = require('actions-on-google').DialogflowApp; // Google Assistant helper library
+const request = require("request");
+const url = "http://spaceapi.motionlab.berlin";
+
 
 exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, response) => {
   console.log('Dialogflow Request headers: ' + JSON.stringify(request.headers));
   console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
 
   if (request.body.result) {
+    getSpaceApiData();
     processV1Request(request, response);
   } else if (request.body.queryResult) {
     processV2Request(request, response);
@@ -332,3 +336,14 @@ const richResponsesV2 = [
     'card': richResponseV2Card
   }
 ];
+
+function getSpaceApiData() {
+ request.get(url, (error, response, body) => {
+   let json = JSON.parse(body);
+   console.info(
+     `last_update: ${json.state.lastchange}`,
+     `open: ${json.state.open}`,
+     `message: ${json.state.message}`
+   );
+ });
+};
