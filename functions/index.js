@@ -18,8 +18,20 @@
 
 const functions = require('firebase-functions'); // Cloud Functions for Firebase library
 const DialogflowApp = require('actions-on-google').DialogflowApp; // Google Assistant helper library
-const request = require("request");
-const url = "http://spaceapi.motionlab.berlin";
+const fetchSpaceApi = require('./fetchSpaceApi');
+
+var isMotionLabOpen = "";
+
+// noinspection JSAnnotator
+fetchSpaceApi.spaceApiResponse((errorMessage, results) => {
+    if (errorMessage) {
+        isMotionLabOpen = JSON.stringify(errorMessage);
+    } else {
+        //console.log(JSON.stringify(results, undefined, 2));
+        //isMotionLabOpen = JSON.stringify(results.openMessage);
+        isMotionLabOpen = results.openMessage;
+    };
+});
 
 
 exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, response) => {
@@ -27,7 +39,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
   console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
 
   if (request.body.result) {
-    getSpaceApiData();
+    console.info('isMotionLabOpen');
     processV1Request(request, response);
   } else if (request.body.queryResult) {
     processV2Request(request, response);
@@ -84,7 +96,7 @@ function processV1Request (request, response) {
         let responseToUser = {
           //data: richResponsesV1, // Optional, uncomment to enable
           //outputContexts: [{'name': 'weather', 'lifespan': 2, 'parameters': {'city': 'Rome'}}], // Optional, uncomment to enable
-          speech: 'This message is from Dialogflow\'s Cloud Functions for Firebase editor!', // spoken response
+          speech: isMotionLabOpen,//'This message is from Dialogflow\'s Cloud Functions for Firebase editor!', // spoken response
           text: 'This is from Dialogflow\'s Cloud Functions for Firebase editor! :-)' // displayed response
         };
         sendResponse(responseToUser);
@@ -336,14 +348,3 @@ const richResponsesV2 = [
     'card': richResponseV2Card
   }
 ];
-
-function getSpaceApiData() {
- request.get(url, (error, response, body) => {
-   let json = JSON.parse(body);
-   console.info(
-     `last_update: ${json.state.lastchange}`,
-     `open: ${json.state.open}`,
-     `message: ${json.state.message}`
-   );
- });
-};
