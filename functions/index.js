@@ -24,11 +24,10 @@ var isMotionLabOpen = "";
 
 // noinspection JSAnnotator
 fetchSpaceApi.spaceApiResponse((errorMessage, results) => {
+    console.info(isMotionLabOpen);
     if (errorMessage) {
-        isMotionLabOpen = JSON.stringify(errorMessage);
+        isMotionLabOpen = errorMessage;
     } else {
-        //console.log(JSON.stringify(results, undefined, 2));
-        //isMotionLabOpen = JSON.stringify(results.openMessage);
         isMotionLabOpen = results.openMessage;
     };
 });
@@ -88,8 +87,8 @@ function processV1Request (request, response) {
         let responseToUser = {
           //googleRichResponse: googleRichResponse, // Optional, uncomment to enable
           //googleOutputContexts: ['weather', 2, { ['city']: 'rome' }], // Optional, uncomment to enable
-          speech: 'This message is from Dialogflow\'s Cloud Functions for Firebase editor!', // spoken response
-          text: 'This is from Dialogflow\'s Cloud Functions for Firebase editor! :-)' // displayed response
+          speech: isMotionLabOpen, // spoken response
+          text: isMotionLabOpen // displayed response
         };
         sendGoogleResponse(responseToUser);
       } else {
@@ -97,7 +96,7 @@ function processV1Request (request, response) {
           //data: richResponsesV1, // Optional, uncomment to enable
           //outputContexts: [{'name': 'weather', 'lifespan': 2, 'parameters': {'city': 'Rome'}}], // Optional, uncomment to enable
           speech: isMotionLabOpen,//'This message is from Dialogflow\'s Cloud Functions for Firebase editor!', // spoken response
-          text: 'This is from Dialogflow\'s Cloud Functions for Firebase editor! :-)' // displayed response
+          text: isMotionLabOpen // displayed response
         };
         sendResponse(responseToUser);
       }

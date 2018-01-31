@@ -7,6 +7,7 @@ var fetchSpaceApi = (callback) => {
     }, (error, response, body) => {
         if (error) {
             callback('Unable to fetch motion lab space api.');
+            console.error(error);
         } else  {
             callback(undefined, {
                 open: body.state.open,
